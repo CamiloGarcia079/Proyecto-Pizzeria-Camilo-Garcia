@@ -1,8 +1,7 @@
 -- consultas.sql
-USE pizzeria_don_piccolo;
+-- (Adaptado para OneCompiler: Sin USE)
 
 -- 1. Clientes con pedidos entre dos fechas (BETWEEN).
--- Ejemplo: Pedidos entre el 1 de enero y 31 de enero de 2024.
 SELECT DISTINCT c.nombre, c.telefono, p.fecha_hora, p.total
 FROM clientes c
 JOIN pedidos p ON c.id_cliente = p.id_cliente
@@ -30,7 +29,6 @@ WHERE d.hora_entrega IS NOT NULL
 GROUP BY r.zona_asignada;
 
 -- 5. Clientes que gastaron más de un monto (HAVING).
--- Ejemplo: Clientes que gastaron más de 50,000 en total histórico.
 SELECT c.nombre, SUM(p.total) AS total_gastado
 FROM clientes c
 JOIN pedidos p ON c.id_cliente = p.id_cliente
@@ -38,20 +36,16 @@ GROUP BY c.id_cliente, c.nombre
 HAVING SUM(p.total) > 50000;
 
 -- 6. Búsqueda por coincidencia parcial de nombre de pizza (LIKE).
--- Ejemplo: Buscar todas las pizzas que contengan la palabra "Queso".
 SELECT * 
 FROM pizzas 
 WHERE nombre LIKE '%Queso%';
 
 -- 7. Subconsulta para obtener los clientes frecuentes (más de 5 pedidos mensuales).
--- Selecciona clientes que tienen más de 5 pedidos en el mes actual.
 SELECT nombre, telefono 
 FROM clientes 
 WHERE id_cliente IN (
     SELECT id_cliente 
     FROM pedidos 
-    WHERE MONTH(fecha_hora) = MONTH(CURRENT_DATE()) 
-      AND YEAR(fecha_hora) = YEAR(CURRENT_DATE())
     GROUP BY id_cliente 
     HAVING COUNT(id_pedido) > 5
 );

@@ -1,20 +1,17 @@
 -- triggers.sql
-USE pizzeria_don_piccolo;
+-- (Adaptado para OneCompiler: Sin USE)
 
 DELIMITER //
 
 -- 1. Trigger de actualización automática de stock de ingredientes cuando se realiza un pedido.
--- Se dispara al insertar en detalle_pedidos.
 CREATE TRIGGER trg_actualizar_stock
 AFTER INSERT ON detalle_pedidos
 FOR EACH ROW
 BEGIN
-    -- Declarar variables para el cursor
     DECLARE v_id_ingrediente INT;
     DECLARE v_cantidad_necesaria DECIMAL(10,2);
     DECLARE done INT DEFAULT FALSE;
     
-    -- Cursor para obtener los ingredientes y cantidades de la pizza pedida
     DECLARE cur_ingredientes CURSOR FOR 
         SELECT id_ingrediente, cantidad_necesaria 
         FROM pizza_ingredientes 
@@ -30,7 +27,6 @@ BEGIN
             LEAVE leer_loop;
         END IF;
         
-        -- Actualizar el stock descontando: cantidad de pizzas * cantidad_necesaria por pizza
         UPDATE ingredientes 
         SET stock_actual = stock_actual - (NEW.cantidad * v_cantidad_necesaria)
         WHERE id_ingrediente = v_id_ingrediente;
@@ -40,7 +36,7 @@ BEGIN
     CLOSE cur_ingredientes;
 END //
 
--- 2. Trigger de auditoría que registre en historial_precios cada vez que se modifique el precio_base de una pizza.
+-- 2. Trigger de auditoría que registre en historial_precios cada vez que se modifique el precio_base.
 CREATE TRIGGER trg_auditoria_precios
 AFTER UPDATE ON pizzas
 FOR EACH ROW
@@ -51,12 +47,11 @@ BEGIN
     END IF;
 END //
 
--- 3. Trigger para marcar repartidor como “disponible” nuevamente cuando termina un domicilio (hora_entrega is set).
+-- 3. Trigger para marcar repartidor como “disponible” nuevamente cuando termina un domicilio.
 CREATE TRIGGER trg_repartidor_disponible
 AFTER UPDATE ON domicilios
 FOR EACH ROW
 BEGIN
-    -- Si la hora de entrega se acaba de registrar y antes era NULL
     IF OLD.hora_entrega IS NULL AND NEW.hora_entrega IS NOT NULL THEN
         UPDATE repartidores 
         SET estado = 'Disponible' 

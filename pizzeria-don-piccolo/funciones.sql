@@ -1,5 +1,5 @@
 -- funciones.sql
-USE pizzeria_don_piccolo;
+-- (Adaptado para OneCompiler: Sin USE)
 
 DELIMITER //
 
@@ -30,7 +30,6 @@ BEGIN
 END //
 
 -- 2. Función para calcular la ganancia neta diaria
--- Ventas totales - Costos de ingredientes de los pedidos entregados ese día
 CREATE FUNCTION calcular_ganancia_neta_diaria(p_fecha DATE)
 RETURNS DECIMAL(10,2)
 DETERMINISTIC
@@ -62,17 +61,14 @@ CREATE PROCEDURE registrar_entrega_domicilio(
 BEGIN
     DECLARE v_id_pedido INT;
     
-    -- Actualizar la hora de entrega en el domicilio
     UPDATE domicilios 
     SET hora_entrega = p_hora_entrega 
     WHERE id_domicilio = p_id_domicilio;
     
-    -- Obtener el id del pedido asociado
     SELECT id_pedido INTO v_id_pedido 
     FROM domicilios 
     WHERE id_domicilio = p_id_domicilio;
     
-    -- Cambiar el estado del pedido a 'Entregado'
     UPDATE pedidos 
     SET estado = 'Entregado' 
     WHERE id_pedido = v_id_pedido;

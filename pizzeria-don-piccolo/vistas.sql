@@ -1,8 +1,7 @@
 -- vistas.sql
-USE pizzeria_don_piccolo;
+-- (Adaptado para OneCompiler: Sin USE)
 
 -- 1. Vista de resumen de pedidos por cliente
--- Muestra el nombre del cliente, cantidad de pedidos y total gastado.
 CREATE OR REPLACE VIEW vista_resumen_clientes AS
 SELECT 
     c.nombre AS nombre_cliente, 
@@ -13,7 +12,6 @@ LEFT JOIN pedidos p ON c.id_cliente = p.id_cliente
 GROUP BY c.id_cliente, c.nombre;
 
 -- 2. Vista de desempeño de repartidores
--- Muestra el número de entregas, tiempo promedio (en minutos), y zona.
 CREATE OR REPLACE VIEW vista_desempeno_repartidores AS
 SELECT 
     r.nombre AS nombre_repartidor, 
@@ -35,3 +33,10 @@ SELECT
     unidad_medida
 FROM ingredientes
 WHERE stock_actual < stock_minimo;
+
+-- Mostrar resultados de las vistas (Para que al correr el archivo se vea algo)
+SELECT '--- RESULTADO VISTA CLIENTES ---' AS Vista;
+SELECT * FROM vista_resumen_clientes;
+
+SELECT '--- RESULTADO VISTA STOCK BAJO ---' AS Vista;
+SELECT * FROM vista_stock_bajo;
