@@ -6,12 +6,12 @@ DELIMITER //
 -- 1. Función para calcular el total de un pedido
 -- Suma precios de pizzas + costo de envío + IVA (19%)
 CREATE FUNCTION calcular_total_pedido(p_id_pedido INT) 
-RETURNS DECIMAL(10,2)
+RETURNS INT
 DETERMINISTIC
 BEGIN
-    DECLARE v_subtotal_pizzas DECIMAL(10,2) DEFAULT 0;
-    DECLARE v_costo_envio DECIMAL(10,2) DEFAULT 0;
-    DECLARE v_total DECIMAL(10,2);
+    DECLARE v_subtotal_pizzas INT DEFAULT 0;
+    DECLARE v_costo_envio INT DEFAULT 0;
+    DECLARE v_total INT;
     
     -- Calcular subtotal de las pizzas
     SELECT IFNULL(SUM(cantidad * precio_unitario), 0) INTO v_subtotal_pizzas
@@ -23,19 +23,19 @@ BEGIN
     FROM domicilios
     WHERE id_pedido = p_id_pedido;
     
-    -- Calcular total con IVA del 19%
-    SET v_total = (v_subtotal_pizzas + v_costo_envio) * 1.19;
+    -- Calcular total con IVA del 19% (se redondea al peso más cercano)
+    SET v_total = ROUND((v_subtotal_pizzas + v_costo_envio) * 1.19);
     
     RETURN v_total;
 END //
 
 -- 2. Función para calcular la ganancia neta diaria
 CREATE FUNCTION calcular_ganancia_neta_diaria(p_fecha DATE)
-RETURNS DECIMAL(10,2)
+RETURNS INT
 DETERMINISTIC
 BEGIN
-    DECLARE v_ventas DECIMAL(10,2) DEFAULT 0;
-    DECLARE v_costos DECIMAL(10,2) DEFAULT 0;
+    DECLARE v_ventas INT DEFAULT 0;
+    DECLARE v_costos INT DEFAULT 0;
     
     -- Total de ventas del día (solo pedidos entregados)
     SELECT IFNULL(SUM(total), 0) INTO v_ventas
