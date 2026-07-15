@@ -60,3 +60,14 @@ BEGIN
 END //
 
 DELIMITER ;
+
+-- ==========================================================
+-- PRUEBA DE TRIGGERS (Para que se vea el resultado en pantalla)
+-- ==========================================================
+
+-- Demostración del Trigger 2: Historial de Precios
+SELECT '--- CAMBIANDO EL PRECIO DE UNA PIZZA PARA ACTIVAR EL TRIGGER ---' AS Acción;
+UPDATE pizzas SET precio_base = 28000 WHERE id_pizza = 1;
+
+SELECT '--- RESULTADO: EL TRIGGER GUARDO EL CAMBIO EN EL HISTORIAL ---' AS Resultado;
+SELECT * FROM historial_precios;

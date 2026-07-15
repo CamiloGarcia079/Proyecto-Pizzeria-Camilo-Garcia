@@ -1,8 +1,8 @@
 -- vistas.sql
--- (Adaptado para OneCompiler: Sin USE)
+-- (Adaptado para OneCompiler: Sin USE y Sin OR REPLACE)
 
 -- 1. Vista de resumen de pedidos por cliente
-CREATE OR REPLACE VIEW vista_resumen_clientes AS
+CREATE VIEW vista_resumen_clientes AS
 SELECT 
     c.nombre AS nombre_cliente, 
     COUNT(p.id_pedido) AS cantidad_pedidos, 
@@ -12,7 +12,7 @@ LEFT JOIN pedidos p ON c.id_cliente = p.id_cliente
 GROUP BY c.id_cliente, c.nombre;
 
 -- 2. Vista de desempeño de repartidores
-CREATE OR REPLACE VIEW vista_desempeno_repartidores AS
+CREATE VIEW vista_desempeno_repartidores AS
 SELECT 
     r.nombre AS nombre_repartidor, 
     r.zona_asignada, 
@@ -24,7 +24,7 @@ WHERE d.hora_entrega IS NOT NULL
 GROUP BY r.id_repartidor, r.nombre, r.zona_asignada;
 
 -- 3. Vista de stock de ingredientes por debajo del mínimo permitido.
-CREATE OR REPLACE VIEW vista_stock_bajo AS
+CREATE VIEW vista_stock_bajo AS
 SELECT 
     id_ingrediente, 
     nombre, 

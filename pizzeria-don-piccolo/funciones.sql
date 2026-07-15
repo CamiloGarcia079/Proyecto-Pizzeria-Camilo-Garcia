@@ -76,3 +76,16 @@ BEGIN
 END //
 
 DELIMITER ;
+
+-- ==========================================================
+-- PRUEBA DE FUNCIONES Y PROCEDIMIENTOS
+-- ==========================================================
+
+SELECT '--- RESULTADO FUNCION: CALCULAR TOTAL DEL PEDIDO 1 (Con IVA) ---' AS Resultado;
+SELECT calcular_total_pedido(1) AS Total_Pedido_Con_IVA;
+
+SELECT '--- EJECUTANDO PROCEDIMIENTO: REGISTRAR ENTREGA DEL DOMICILIO 1 ---' AS Acción;
+CALL registrar_entrega_domicilio(1, '2024-01-15 10:45:00');
+
+SELECT '--- RESULTADO: EL ESTADO DEL PEDIDO AHORA ES ENTREGADO ---' AS Resultado;
+SELECT id_pedido, estado FROM pedidos WHERE id_pedido = 1;
