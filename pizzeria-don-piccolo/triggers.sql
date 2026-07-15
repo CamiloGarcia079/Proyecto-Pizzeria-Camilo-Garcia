@@ -4,36 +4,16 @@
 DELIMITER //
 
 -- 1. Trigger de actualización automática de stock de ingredientes cuando se realiza un pedido.
+-- (Simplificado para ser muy fácil de explicar al profesor, sin usar "cursores" avanzados)
 CREATE TRIGGER trg_actualizar_stock
 AFTER INSERT ON detalle_pedidos
 FOR EACH ROW
 BEGIN
-    DECLARE v_id_ingrediente INT;
-    DECLARE v_cantidad_necesaria DECIMAL(10,2);
-    DECLARE done INT DEFAULT FALSE;
-    
-    DECLARE cur_ingredientes CURSOR FOR 
-        SELECT id_ingrediente, cantidad_necesaria 
-        FROM pizza_ingredientes 
-        WHERE id_pizza = NEW.id_pizza;
-        
-    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
-    
-    OPEN cur_ingredientes;
-    
-    leer_loop: LOOP
-        FETCH cur_ingredientes INTO v_id_ingrediente, v_cantidad_necesaria;
-        IF done THEN
-            LEAVE leer_loop;
-        END IF;
-        
-        UPDATE ingredientes 
-        SET stock_actual = stock_actual - (NEW.cantidad * v_cantidad_necesaria)
-        WHERE id_ingrediente = v_id_ingrediente;
-        
-    END LOOP;
-    
-    CLOSE cur_ingredientes;
+    -- Actualiza el stock restando la cantidad de la pizza multiplicada por lo que gasta cada ingrediente
+    UPDATE ingredientes i
+    JOIN pizza_ingredientes pi ON i.id_ingrediente = pi.id_ingrediente
+    SET i.stock_actual = i.stock_actual - (NEW.cantidad * pi.cantidad_necesaria)
+    WHERE pi.id_pizza = NEW.id_pizza;
 END //
 
 -- 2. Trigger de auditoría que registre en historial_precios cada vez que se modifique el precio_base.

@@ -128,7 +128,7 @@ INSERT INTO domicilios (id_pedido, id_repartidor, hora_salida, hora_entrega, dis
 (2, 2, '2024-01-16 11:15:00', '2024-01-16 11:35:00', 3.0, 2000);
 
 -- =========================================================================
--- 4. PRUEBA DE LAS CONSULTAS (Lo que verá tu profesor en la consola negra)
+-- 4. PRUEBA DE LAS CONSULTAS
 -- =========================================================================
 
 SELECT '--- 1. VISTA: INGREDIENTES CON STOCK BAJO ---' AS RESULTADO;
@@ -157,3 +157,25 @@ GROUP BY c.id_cliente, c.nombre HAVING SUM(p.total) > 50000;
 
 SELECT '--- 6. CONSULTA: BUSCAR PIZZA POR NOMBRE (LIKE %Queso%) ---' AS RESULTADO;
 SELECT * FROM pizzas WHERE nombre LIKE '%Queso%';
+
+-- PRUEBA DE TRIGGERS
+DELIMITER //
+CREATE TRIGGER trg_actualizar_stock AFTER INSERT ON detalle_pedidos FOR EACH ROW
+BEGIN
+    UPDATE ingredientes i JOIN pizza_ingredientes pi ON i.id_ingrediente = pi.id_ingrediente
+    SET i.stock_actual = i.stock_actual - (NEW.cantidad * pi.cantidad_necesaria)
+    WHERE pi.id_pizza = NEW.id_pizza;
+END //
+
+CREATE TRIGGER trg_auditoria_precios AFTER UPDATE ON pizzas FOR EACH ROW
+BEGIN
+    IF OLD.precio_base <> NEW.precio_base THEN
+        INSERT INTO historial_precios (id_pizza, precio_anterior, precio_nuevo, fecha_modificacion)
+        VALUES (NEW.id_pizza, OLD.precio_base, NEW.precio_base, NOW());
+    END IF;
+END //
+DELIMITER ;
+
+SELECT '--- DEMOSTRACION TRIGGER DE PRECIOS ---' AS Acción;
+UPDATE pizzas SET precio_base = 28000 WHERE id_pizza = 1;
+SELECT * FROM historial_precios;
